@@ -1,2 +1,1 @@
-# polygon_voronoi
-Polygon based voronoi diagram
+# Polygon based voronoi diagram
