@@ -14,7 +14,9 @@ def distance(_1, _2) -> float:
 def radian(_1, _2) -> float:
     _1_n = _1 / length(_1)
     _2_n = _2 / length(_2)
-    return math.acos(np.dot(_1_n, _2_n))
+    dot = np.dot(_1_n, _2_n)
+    if dot > 1.0: dot = 1.0
+    return math.acos(dot)
 
 # get closest(but smaller) value index on vector
 def find_closest(vec, ele) -> int:
