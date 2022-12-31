@@ -23,5 +23,5 @@ python
 * result after optimization  
   <img src="./result/optimized_result.png" width="430px" height="360px">
 
-* astar algorithm using optimized result
-  <img src="./result/astart_result.png" width="430px" height="360px">
+* astar algorithm using optimized result  
+  <img src="./result/astar_result.png" width="430px" height="360px">
