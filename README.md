@@ -1,9 +1,12 @@
 # Polygon based voronoi diagram
 
 ### Requirments
-* python
-* numpy
-* matplotlib
+~~~
+python   
+    - numpy  
+    - matplotlib  
+    - rdp  
+~~~
 -----
 
 ### Result
