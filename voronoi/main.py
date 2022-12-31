@@ -1,11 +1,12 @@
-from voronoi import Line, Triangle, OptimizedVoronoi
+from voronoi import OptimizedVoronoi
+from geometry import Line, Triangle
 
 
 if __name__ == '__main__':
     # adjustable values
     Line.point_distance = 0.2
     Triangle.distance_trash = 0.5
-    OptimizedVoronoi.division_angle = 0.1
+    OptimizedVoronoi.rdp_epsilon = 0.15
 
     # boundary
     b1 = Line([[0.0, 0.0], [10.0, 0.0]])
@@ -32,13 +33,12 @@ if __name__ == '__main__':
     vor.add_boundary(b3)
     vor.add_boundary(b4)
 
+    # add points
+    vor.add_points([[2.0, 8.0], [8.3, 2.0]])
+
     # run
-    vor.run_non_lined()
-    vor.generate_plot()
-    vor.run_non_deleted()
-    vor.generate_plot()
-    vor.run_non_optimized()
-    vor.generate_plot()
-    vor.run()
-    vor.generate_plot()
+    vor.run(OptimizedVoronoi.type.non_lined)
+    vor.run(OptimizedVoronoi.type.non_deleted)
+    vor.run(OptimizedVoronoi.type.non_optimized)
+    result = vor.run()
     vor.show()
