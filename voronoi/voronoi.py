@@ -7,7 +7,7 @@ from scipy.spatial import Voronoi, voronoi_plot_2d
 
 from indexDictionary import IndexDict
 from geometry import Triangle, Line
-from util import *
+from Util import *
 
 
 # optimized voronoi diagram
