@@ -1,12 +1,13 @@
-from voronoi import OptimizedVoronoi
+from voronoi import PolygonVoronoi, run_type
 from geometry import Line, Triangle
+from astar import Astar
 
 
 if __name__ == '__main__':
     # adjustable values
     Line.point_distance = 0.2
     Triangle.distance_trash = 0.5
-    OptimizedVoronoi.rdp_epsilon = 0.15
+    PolygonVoronoi.rdp_epsilon = 0.15
 
     # boundary
     b1 = Line([[0.0, 0.0], [10.0, 0.0]])
@@ -19,8 +20,12 @@ if __name__ == '__main__':
     t2 = Triangle([[7.0, 6.0], [9.0, 9.0], [5.0, 7.0]])
     t3 = Triangle([[5.0, 3.0], [7.0, 4.0], [6.0, 5.0]])
 
+    #point
+    start = [2.0, 8.0]
+    end = [8.3, 2.0]
+
     # voronoi
-    vor = OptimizedVoronoi()
+    vor = PolygonVoronoi()
 
     # add triangles
     vor.add_triangle(t1)
@@ -34,11 +39,18 @@ if __name__ == '__main__':
     vor.add_boundary(b4)
 
     # add points
-    vor.add_points([[2.0, 8.0], [8.3, 2.0]])
+    vor.add_point(start)
+    vor.add_point(end)
 
     # run
-    vor.run(OptimizedVoronoi.type.non_lined)
-    vor.run(OptimizedVoronoi.type.non_deleted)
-    vor.run(OptimizedVoronoi.type.non_optimized)
-    result = vor.run()
-    vor.show()
+    vor.run(run_type.non_lined)
+    vor.run(run_type.non_deleted)
+    vor.run(run_type.non_optimized)
+    vor.run(run_type.optimized)
+    result = vor.get_result()
+
+    astar = Astar(result, start, end)
+    astar.run()
+    astar.generate_plot()
+    
+    astar.show()

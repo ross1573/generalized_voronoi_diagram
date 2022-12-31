@@ -5,24 +5,24 @@ from enum import Enum
 from collections import deque
 from scipy.spatial import Voronoi, voronoi_plot_2d
 
-from indexDictionary import IndexDict
-from geometry import Triangle, Line
-from Util import *
+from dictionary import IndexDict
+from geometry import *
 
 
-# optimized voronoi diagram
-class OptimizedVoronoi:
-    class type(Enum):
-        non_lined = 0,
-        non_deleted = 1,
-        non_optimized = 2,
-        optimized = 3
+class run_type(Enum):
+    non_lined = 0,
+    non_deleted = 1,
+    non_optimized = 2,
+    optimized = 3
     
-    class _RetT:
-        points: list
-        vertices: list
-        ridges: list
+class Result:
+    points: list
+    vertices: list
+    ridge_vertices: list
 
+
+# polygon based voronoi diagram
+class PolygonVoronoi:
     rdp_epsilon: int
 
     def __init__(self) -> None:
@@ -35,8 +35,8 @@ class OptimizedVoronoi:
         self.__triangle_lined_points = []
         self.__boundary_lined_points = []
 
-    def add_points(self, points: list) -> None:
-        self.__points += points
+    def add_point(self, point: list) -> None:
+        self.__points.append(np.array(point))
     
     def add_triangle(self, triangle: Triangle) -> None:
         self.__triangles.append(triangle)
@@ -53,19 +53,17 @@ class OptimizedVoronoi:
     def __run_voronoi(self, points) -> None:
         self.__vor = Voronoi(points=points)
 
-    def run_non_lined(self) -> _RetT:
+    def run_non_lined(self) -> None:
         self.__run_voronoi(self.__boudnary_points + 
                            self.__triangle_points +
                            self.__points)
-        return self.__generate_return_value()
     
-    def run_non_deleted(self) -> _RetT:
+    def run_non_deleted(self) -> None:
         self.__run_voronoi(self.__boundary_lined_points + 
                            self.__triangle_lined_points +
                            self.__points)
-        return self.__generate_return_value()
     
-    def run_non_optimized(self) -> _RetT:
+    def run_non_optimized(self) -> None:
         # run voronoi
         self.__run_voronoi(self.__boundary_lined_points + 
                            self.__triangle_lined_points +
@@ -82,9 +80,7 @@ class OptimizedVoronoi:
         # reorganize ridge vertices
         self.__reorganize_ridge(vertex_to_delete)
 
-        return self.__generate_return_value()
-
-    def run_optimized(self) -> _RetT:
+    def run_optimized(self) -> None:
         # run voronoi
         self.run_non_optimized()
 
@@ -100,16 +96,13 @@ class OptimizedVoronoi:
 
         # regenerate ridges
         self.__regenerate_voronoi(optimized_chains)
-        
-        return self.__generate_return_value()
 
-    def run(self, type = type.optimized, plot = True) -> _RetT:
-        if   type == self.type.non_lined:     result = self.run_non_lined()
-        elif type == self.type.non_deleted:   result = self.run_non_deleted()
-        elif type == self.type.non_optimized: result = self.run_non_optimized()
-        elif type == self.type.optimized:     result = self.run_optimized()
+    def run(self, type = run_type.optimized, plot = True) -> None:
+        if   type == run_type.non_lined:     self.run_non_lined()
+        elif type == run_type.non_deleted:   self.run_non_deleted()
+        elif type == run_type.non_optimized: self.run_non_optimized()
+        elif type == run_type.optimized:     self.run_optimized()
         if plot: self.generate_plot()
-        return result
 
     # optimize line using Ramer-Douglas-Peucker algorithm
     def __optimize_line(self, chains) -> list:
@@ -294,11 +287,11 @@ class OptimizedVoronoi:
             _0_i, _1_i = find_closest(deleted_vertices, _0), find_closest(deleted_vertices, _1)
             self.__vor.ridge_vertices[i] = np.array([_0 - _0_i, _1 - _1_i], int)
 
-    def __generate_return_value(self) -> _RetT:
-        ret_val = self._RetT()
+    def get_result(self) -> Result:
+        ret_val = Result()
         ret_val.points = np.array(self.__vor.points, dtype=float, copy=True)
         ret_val.vertices = np.array(self.__vor.vertices, dtype=float, copy=True)
-        ret_val.ridges = np.array(self.__vor.ridge_vertices, dtype=int, copy=True)
+        ret_val.ridge_vertices = np.array(self.__vor.ridge_vertices, dtype=int, copy=True)
         return ret_val
 
     def generate_plot(self) -> None:

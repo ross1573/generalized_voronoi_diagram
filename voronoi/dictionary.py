@@ -5,7 +5,8 @@ class IndexDict:
         for key, value in list(rdict.items()):
             if self.__contains_(dict, key):
                 for ele in value:
-                    dict[key].append(ele)
+                    if ele not in dict[key]:
+                        dict[key].append(ele)
             else:
                 dict[key] = value
         self.__dict = dict
@@ -36,6 +37,17 @@ class IndexDict:
         key.append(current)
 
         return {key[i]: value[i] for i in range(len(key))}
+
+    def insert(self, key, value) -> None:
+        if self.contains(key):
+            raise KeyError("key already exists")
+
+        self.__dict[key] = value
+        for ele in value:
+            if self.contains(ele):
+                self.find(ele).append(key)
+            else:
+                self.__dict[ele] = [key]
 
     def contains(self, key) -> bool:
         if key in list(self.__dict.keys()): return True
