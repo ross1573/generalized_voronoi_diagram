@@ -23,7 +23,7 @@ class Result:
 
 # polygon based voronoi diagram
 class PolygonVoronoi:
-    rdp_epsilon: int
+    rdp_epsilon: float
 
     def __init__(self) -> None:
         self.__points = []
@@ -37,6 +37,10 @@ class PolygonVoronoi:
 
     def add_point(self, point: list) -> None:
         self.__points.append(np.array(point))
+
+    def add_points(self, points: list) -> None:
+        for point in points:
+            self.add_point(point)
     
     def add_triangle(self, triangle: Triangle) -> None:
         self.__triangles.append(triangle)
@@ -44,26 +48,36 @@ class PolygonVoronoi:
         for ele in triangle.points:
             self.__triangle_points.append(ele)
 
+    def add_triangles(self, triangles: list[Triangle]) -> None:
+        for triangle in triangles:
+            self.add_triangle(triangle)
+
     def add_boundary(self, boundary: Line) -> None:
         self.__boundaries.append(boundary)
         self.__boundary_lined_points += boundary.generate_line()
         for ele in boundary.points:
             self.__boudnary_points.append(ele)
+    
+    def add_boundaries(self, boundaries: list[Line]) -> None:
+        for boundary in boundaries:
+            self.add_boundary(boundary)
 
     def __run_voronoi(self, points) -> None:
         self.__vor = Voronoi(points=points)
 
-    def run_non_lined(self) -> None:
+    def run_non_lined(self) -> Result:
         self.__run_voronoi(self.__boudnary_points + 
                            self.__triangle_points +
                            self.__points)
+        return self.__generate_result()
     
-    def run_non_deleted(self) -> None:
+    def run_non_deleted(self) -> Result:
         self.__run_voronoi(self.__boundary_lined_points + 
                            self.__triangle_lined_points +
                            self.__points)
+        return self.__generate_result()
     
-    def run_non_optimized(self) -> None:
+    def run_non_optimized(self) -> Result:
         # run voronoi
         self.__run_voronoi(self.__boundary_lined_points + 
                            self.__triangle_lined_points +
@@ -80,7 +94,9 @@ class PolygonVoronoi:
         # reorganize ridge vertices
         self.__reorganize_ridge(vertex_to_delete)
 
-    def run_optimized(self) -> None:
+        return self.__generate_result()
+
+    def run_optimized(self) -> Result:
         # run voronoi
         self.run_non_optimized()
 
@@ -97,12 +113,15 @@ class PolygonVoronoi:
         # regenerate ridges
         self.__regenerate_voronoi(optimized_chains)
 
-    def run(self, type = run_type.optimized, plot = True) -> None:
-        if   type == run_type.non_lined:     self.run_non_lined()
-        elif type == run_type.non_deleted:   self.run_non_deleted()
-        elif type == run_type.non_optimized: self.run_non_optimized()
-        elif type == run_type.optimized:     self.run_optimized()
+        return self.__generate_result()
+
+    def run(self, type = run_type.optimized, plot = True) -> Result:
+        if   type == run_type.non_lined:     result = self.run_non_lined()
+        elif type == run_type.non_deleted:   result = self.run_non_deleted()
+        elif type == run_type.non_optimized: result = self.run_non_optimized()
+        elif type == run_type.optimized:     result = self.run_optimized()
         if plot: self.generate_plot()
+        return result
 
     # optimize line using Ramer-Douglas-Peucker algorithm
     def __optimize_line(self, chains) -> list:
@@ -287,7 +306,7 @@ class PolygonVoronoi:
             _0_i, _1_i = find_closest(deleted_vertices, _0), find_closest(deleted_vertices, _1)
             self.__vor.ridge_vertices[i] = np.array([_0 - _0_i, _1 - _1_i], int)
 
-    def get_result(self) -> Result:
+    def __generate_result(self) -> Result:
         ret_val = Result()
         ret_val.points = np.array(self.__vor.points, dtype=float, copy=True)
         ret_val.vertices = np.array(self.__vor.vertices, dtype=float, copy=True)

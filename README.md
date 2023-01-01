@@ -7,10 +7,14 @@ python
     - matplotlib  
     - scipy  
     - rdp  
+    - opencv-python  
 ~~~
 -----
 
 ### Result
+* polygon detected result  
+  <img src="./result/polygon_detect_result" width="430px" height="360px">
+
 * non polygon lined(normal point based voronoi diagram)  
   <img src="./result/non_lined_result.png" width="430px" height="360px">
 

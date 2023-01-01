@@ -122,10 +122,14 @@ class Astar:
         return chained
 
     # if neighbor count < 2 than vertices are not closed
+    # TODO: fix closure detecting algorithm
     def __is_closed(self, vec) -> bool:
         for ele in vec:
             neighbors = self.__dict.find(ele)
             exist_count = 0
+            ###
+            if len(neighbors) == 1: continue
+            ###
             for neighbor in neighbors:
                 if neighbor in vec:
                     exist_count += 1
@@ -134,6 +138,7 @@ class Astar:
         return True
     
     # chain vertices to check if non-adjacent value is added
+    # TODO: fix finding unchained vertices
     def __unchained_vertex(self, vec) -> bool:
         chain = [vec[0]]
         while True:
