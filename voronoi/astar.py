@@ -99,63 +99,28 @@ class Astar:
     # find adjacent vertices
     def __find_adjacent(self, point) -> list:
         vertices = self.__vor.vertices
+        adjacent = []
 
-        # order by distance
-        distance_order = []
+        # find vertex that does not intersect with ridges
         for i in range(len(vertices)):
-            dist = distance(point, vertices[i])
-            distance_order.append([i, dist])
-        distance_order.sort(key=lambda x: x[1])
-        
-        for i in range(len(distance_order)):
-            distance_order[i] = distance_order[i][0]
-
-        # append vertex until vertices is closed
-        neighbors = distance_order[:3]
-        for ele in distance_order[3:]:
-            if self.__is_closed(neighbors): break
-            neighbors.append(ele)
-
-        # delete unchained vertex
-        unchained = self.__unchained_vertex(neighbors)
-        chained = np.delete(neighbors, unchained)
-        return chained
-
-    # if neighbor count < 2 than vertices are not closed
-    # TODO: fix closure detecting algorithm
-    def __is_closed(self, vec) -> bool:
-        for ele in vec:
-            neighbors = self.__dict.find(ele)
-            exist_count = 0
-            ###
-            if len(neighbors) == 1: continue
-            ###
-            for neighbor in neighbors:
-                if neighbor in vec:
-                    exist_count += 1
-            if exist_count < 2:
-                return False
-        return True
-    
-    # chain vertices to check if non-adjacent value is added
-    # TODO: fix finding unchained vertices
-    def __unchained_vertex(self, vec) -> bool:
-        chain = [vec[0]]
-        while True:
-            neighbors = self.__dict.find(chain[-1])
-            appended = False
-            for neighbor in neighbors:
-                if neighbor in vec and neighbor not in chain:
-                    chain.append(neighbor)
-                    appended = True
+            intersecting = False
+            for ridge in self.__vor.ridge_vertices:
+                _1 = [np.array(point), np.array(vertices[i])]
+                _2 = [np.array(vertices[ridge[0]]), np.array(vertices[ridge[1]])]
+                if self.__is_intersecting(_1, _2):
+                    intersecting = True
                     break
-            if not appended: break
+            if not intersecting: adjacent.append(i)
+        return adjacent
 
-        unchained_index = []
-        for i in range(len(vec)):
-            if vec[i] not in chain:
-                unchained_index.append(i)
-        return unchained_index
+    # find out whether two lines are intersecting
+    def __is_intersecting(self, _1, _2) -> bool:
+        # ccw(p1, p2, p3) * ccw(p1, p2, p4)
+        if counter_clockwise(_1[0], _1[1], _2[0]) * counter_clockwise(_1[0], _1[1], _2[1]) < 0:
+            # ccw(p3, p4, p1) * ccw(p3, p4, p2)
+            if counter_clockwise(_2[0], _2[1], _1[0]) * counter_clockwise(_2[0], _2[1], _1[1]) < 0:
+                return True
+        return False
 
     def generate_plot(self) -> None:
         fig, ax = plt.subplots()

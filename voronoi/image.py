@@ -10,7 +10,6 @@ class PolygonDetector:
     rdp_epsilon: float
     area_threshold: int
     thresh_boundary: int
-    bound_multiplier: float
 
     def __init__(self, path, color_threshold = []):
         self.__path = path
@@ -84,12 +83,11 @@ class PolygonDetector:
                 if point[0] < min[0]: min[0] = point[0]
                 if point[1] < min[1]: min[1] = point[1]
 
-        dis = [max[0] - min[0], max[1] - min[1]]
+        dis = [max[0] + min[0], max[1] + min[1]]
         if dis[0] == 0.0 or dis[1] == 0.0:
             raise ValueError("points have only 1d")
 
-        multiplier = [bound[0] / (dis[0] * self.bound_multiplier),
-                      bound[1] / (dis[1] * self.bound_multiplier)]
+        multiplier = [bound[0] / (dis[0]), bound[1] / (dis[1])]
         
         contours = []
         for contour in self.__contours:

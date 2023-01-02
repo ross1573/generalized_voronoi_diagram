@@ -13,7 +13,6 @@ if __name__ == '__main__':
     PolygonDetector.rdp_epsilon = 0.01
     PolygonDetector.area_threshold = 400
     PolygonDetector.thresh_boundary = 5
-    PolygonDetector.bound_multiplier = 2.0
 
     # boundary
     b1 = Line([[0.0, 0.0], [1.0, 0.0]])

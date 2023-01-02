@@ -25,7 +25,21 @@ def find_closest(vec, ele) -> int:
             return i
     return len(vec)
 
+def counter_clockwise(_1, _2, _3) -> int:
+        # vector ab
+        v_1 = _2 - _1
+        # vector ac
+        v_2 = _3 - _1
 
+        # vector ab x ac
+        cross = np.cross(v_1, v_2)
+
+        # if cross > 0 than it's ccw
+        if cross > 0: return 1
+        # if cress == 0 than it's parallel
+        elif cross == 0: return 0
+        # if cross < 0 than it's cw
+        return -1
 
 # line class
 class Line:
