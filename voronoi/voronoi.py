@@ -16,6 +16,9 @@ class run_type(Enum):
     optimized = 3
     
 class Result:
+    triangles: list
+    boundaries: list
+    chains: list
     points: list
     vertices: list
     ridge_vertices: list
@@ -34,6 +37,8 @@ class PolygonVoronoi:
         self.__boudnary_points = []
         self.__triangle_lined_points = []
         self.__boundary_lined_points = []
+
+        self.__chains = []
 
     def add_point(self, point: list) -> None:
         self.__points.append(np.array(point))
@@ -101,11 +106,11 @@ class PolygonVoronoi:
         self.run_non_optimized()
 
         # generate chains in voronoi diagram
-        chains = self.__generate_chains()
-        vertex_chains = self.__generate_vertex_chains(chains)
+        self.__chains = self.__generate_chains()
+        vertex_chains = self.__generate_vertex_chains(self.__chains)
 
         # unoptimizable case
-        if chains == []: return self.__vor
+        if self.__chains == []: return self.__vor
 
         # optimize line
         optimized_chains = self.__optimize_line(vertex_chains)
@@ -211,7 +216,7 @@ class PolygonVoronoi:
         for ele in new_start:
             start.append(ele)
         
-        return chain
+        return np.array(chain)
 
     # generate chain by finding next vertex recursively
     def __chain_(self, dic, idx, chain, feature) -> list:
@@ -265,7 +270,7 @@ class PolygonVoronoi:
 
         for i in range(len(self.__vor.vertices)):
             for tri in self.__triangles:
-                if (tri.is_in_polygon(self.__vor.vertices[i])):
+                if tri.is_in_polygon(self.__vor.vertices[i]):
                     in_polygon.append(i)
                     break
 
@@ -308,9 +313,13 @@ class PolygonVoronoi:
 
     def __generate_result(self) -> Result:
         ret_val = Result()
+        ret_val.triangles = np.array(self.__triangles, dtype=Triangle, copy=True)
+        ret_val.boundaries = np.array(self.__boundaries, dtype=Line, copy=True)
         ret_val.points = np.array(self.__vor.points, dtype=float, copy=True)
         ret_val.vertices = np.array(self.__vor.vertices, dtype=float, copy=True)
         ret_val.ridge_vertices = np.array(self.__vor.ridge_vertices, dtype=int, copy=True)
+        if len(self.__chains) > 0: 
+            ret_val.chains = np.array(self.__chains, dtype=list, copy=True)
         return ret_val
 
     def generate_plot(self) -> None:

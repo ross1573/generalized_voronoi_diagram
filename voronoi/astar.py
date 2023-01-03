@@ -29,14 +29,15 @@ class Astar:
 
     def run(self) -> list:
         node = self.__astar_()
+        vertices = self.__vor.vertices
 
         result = []
         while node != None:
-            result.insert(0, node.idx)
+            result.insert(0, vertices[node.idx])
             node = node.parent
             
         self.__result = result
-        return result
+        return np.array(result)
 
     def __astar_(self) -> __Node:
         open = PriorityQueue()
@@ -139,7 +140,7 @@ class Astar:
         
         segments = []
         for i in range(len(result)-1):
-            seg = [vertices[result[i]], vertices[result[i+1]]]
+            seg = [result[i], result[i+1]]
             segments.append(seg)
         ax.add_collection(LineCollection(segments, colors='r', lw=2.0))
 

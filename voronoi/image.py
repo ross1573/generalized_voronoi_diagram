@@ -1,6 +1,7 @@
 import cv2
 import sys
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy.spatial import Delaunay
 
 from geometry import Triangle
@@ -9,19 +10,22 @@ from geometry import Triangle
 class PolygonDetector:
     rdp_epsilon: float
     area_threshold: int
-    thresh_boundary: int
+    gray_thresh_boundary: int
 
     def __init__(self, path, color_threshold = []):
         self.__path = path
         self.__img_gray = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+        self.__img_gray = cv2.flip(self.__img_gray, 0)
         self.__threshold = []
         for thresh in color_threshold:
             self.add_color_threshold(thresh)
 
     # generate binary image(threshold)
     def add_color_threshold(self, thresh):
-        _t = [thresh - self.thresh_boundary, thresh + self.thresh_boundary]
-        _,threshold = cv2.threshold(self.__img_gray, _t[0], _t[1], cv2.THRESH_BINARY)
+        _t = [thresh - self.gray_thresh_boundary, thresh + self.gray_thresh_boundary]
+        _,threshold_lower = cv2.threshold(self.__img_gray, _t[0], 255, cv2.THRESH_BINARY)
+        _,threshold_upper = cv2.threshold(self.__img_gray, _t[1], 255, cv2.THRESH_BINARY)
+        threshold = threshold_lower - threshold_upper
         self.__threshold.append(threshold)
 
     def run(self, bound = [0.0, 0.0], triangulation = True):
@@ -32,6 +36,8 @@ class PolygonDetector:
 
         if triangulation:
             self.__result = self.triangulation()
+        else:
+            self.__result = self.__contours
         
         return self.__result
 
@@ -72,29 +78,19 @@ class PolygonDetector:
 
         return triangles
 
-    # normailize values between 0 and bound parameter
+    # normalize values between 0 and bound parameter
+    # normalized based on image size
     def normalize(self, bound) -> None:
-        min = [sys.maxsize, sys.maxsize]
-        max = [0, 0]
-        for contour in self.__contours:
-            for point in contour:
-                if point[0] > max[0]: max[0] = point[0]
-                if point[1] > max[1]: max[1] = point[1]
-                if point[0] < min[0]: min[0] = point[0]
-                if point[1] < min[1]: min[1] = point[1]
-
-        dis = [max[0] + min[0], max[1] + min[1]]
-        if dis[0] == 0.0 or dis[1] == 0.0:
-            raise ValueError("points have only 1d")
-
-        multiplier = [bound[0] / (dis[0]), bound[1] / (dis[1])]
+        size = self.__img_gray.shape
+        multiplier = [bound[0] / size[1],
+                      bound[1] / size[0]]
         
         contours = []
         for contour in self.__contours:
             points = []
             for point in contour:
                 x = point[0] * multiplier[0]
-                y = bound[1] - (point[1] * multiplier[1])
+                y = point[1] * multiplier[1]
                 points.append([x,y])
             contours.append(points)
         self.__contours = contours
@@ -108,14 +104,23 @@ class PolygonDetector:
 
     def __generate_result_image(self) -> cv2.Mat:
         img = cv2.imread(self.__path, cv2.IMREAD_COLOR)
+        img = cv2.flip(img, 0)
         for contour in self.__contours_original:
-            cv2.drawContours(img, [contour], 0, (0, 0, 255), 5)
-        return img
-        
-    def show(self):
+            cv2.drawContours(img, [contour], 0, (255, 0, 0), 5)
+        return cv2.flip(img, 0)
+
+    def generate_plot(self):
         img = self.__generate_result_image()
-        cv2.imshow('PolygonDetectResult', img)
-        cv2.waitKey(1)
+        _, ax = plt.subplots()
+        ax.imshow(img)
+
+    def generate_plot_gray(self):
+        img = cv2.flip(self.__img_gray, 0)
+        _, ax = plt.subplots()
+        ax.imshow(img, cmap='gray')
+
+    def show(self):
+        plt.show()
     
     def save(self):
         img = self.__generate_result_image()

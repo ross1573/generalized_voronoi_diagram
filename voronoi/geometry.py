@@ -145,7 +145,7 @@ class Triangle(Line):
             c_2 = np.cross(l_3, l_2)
 
             # if (ab x ap) * (ap x ac) < 0 than the point is in convex
-            if np.dot(c_1, c_2) < 0:
+            if np.dot(c_1, c_2) <= 0.0:
                 return False
         return True
 
