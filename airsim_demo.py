@@ -1,7 +1,7 @@
-from voronoi import PolygonVoronoi, run_type
-from geometry import Line, Triangle
-from astar import Astar
-from image import PolygonDetector
+from voronoi.voronoi import PolygonVoronoi, run_type
+from voronoi.geometry import Line, Triangle
+from voronoi.astar import Astar
+from voronoi.image import PolygonDetector
 
 import airsim
 from multiprocessing import Process

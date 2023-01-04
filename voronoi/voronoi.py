@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from rdp import rdp
@@ -5,8 +6,8 @@ from enum import Enum
 from collections import deque
 from scipy.spatial import Voronoi, voronoi_plot_2d
 
-from dictionary import IndexDict
-from geometry import *
+from voronoi.dictionary import IndexDict
+from voronoi.geometry import *
 
 
 class run_type(Enum):
@@ -88,16 +89,16 @@ class PolygonVoronoi:
                            self.__triangle_lined_points +
                            self.__points)
 
-        # calculate vertices and ridges to delete
-        vertex_to_delete = self.__vertices_in_polygon()
-        ridge_to_delete = self.__ridges_to_delete(vertex_to_delete)
+        # calculate unreachable vertices and ridges
+        unreachable_vertices = self.__vertices_in_polygon()
+        ridge_to_delete = self.__ridges_to_delete(unreachable_vertices)
 
-        # delete
-        self.__delete_vertex(vertex_to_delete)
+        # delete unreachable vertices and ridges
+        self.__delete_vertex(unreachable_vertices)
         self.__delete_ridge(ridge_to_delete)
 
         # reorganize ridge vertices
-        self.__reorganize_ridge(vertex_to_delete)
+        self.__reorganize_ridge(unreachable_vertices)
 
         return self.__generate_result()
 
@@ -117,6 +118,15 @@ class PolygonVoronoi:
 
         # regenerate ridges
         self.__regenerate_voronoi(optimized_chains)
+
+        # calculate unfinished vertices and ridges
+        unfinised_vertices = self.__unfinished_vertices()
+        ridge_to_delete = self.__ridges_to_delete(unfinised_vertices)
+
+        # delete unfinished vertices and ridges
+        self.__delete_vertex(unfinised_vertices)
+        self.__delete_ridge(ridge_to_delete)
+        self.__reorganize_ridge(unfinised_vertices)
 
         return self.__generate_result()
 
@@ -263,6 +273,17 @@ class PolygonVoronoi:
             if neighbor[i] in visited: continue
             new_start_points.append([idx[1], neighbor[i]])
         return new_start_points
+    
+    # calculate vertices which is unfinished
+    def __unfinished_vertices(self) -> list:
+        dic = IndexDict(self.__vor.ridge_vertices)
+        unfinished = []
+
+        for key, value in dic.items():
+            if len(value) == 1:
+                unfinished.append(key)
+        
+        return unfinished
     
     # calculate vertices which are in convex
     def __vertices_in_polygon(self) -> list:

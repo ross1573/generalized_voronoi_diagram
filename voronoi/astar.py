@@ -2,9 +2,9 @@ import matplotlib.pyplot as plt
 from queue import PriorityQueue
 from matplotlib.collections import LineCollection
 
-from voronoi import Result
-from dictionary import IndexDict
-from geometry import *
+from voronoi.voronoi import Result
+from voronoi.dictionary import IndexDict
+from voronoi.geometry import *
 
 
 # astar algorithm for polygon diagram

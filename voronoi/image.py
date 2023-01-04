@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial import Delaunay
 
-from geometry import Triangle
+from voronoi.geometry import Triangle
 
 
 class PolygonDetector:
