@@ -119,6 +119,9 @@ class PolygonVoronoi:
         # regenerate ridges
         self.__regenerate_voronoi(optimized_chains)
 
+        # regenerate chain by optimized value
+        self.__chains = self.__generate_chains()
+
         # calculate unfinished vertices and ridges
         unfinised_vertices = self.__unfinished_vertices()
         ridge_to_delete = self.__ridges_to_delete(unfinised_vertices)
@@ -282,8 +285,19 @@ class PolygonVoronoi:
         for key, value in dic.items():
             if len(value) == 1:
                 unfinished.append(key)
+
+        chain_vertices = np.array([], dtype=int)
+        for ele in unfinished:
+            for chain in self.__chains:
+                if ele == chain[0]: 
+                    chain_vertices = np.append(chain_vertices, chain[:-1])
+                    break
+                elif ele == chain[-1]:
+                    chain_vertices = np.append(chain_vertices, chain[1:])
+                    break
         
-        return unfinished
+        chain_vertices = np.sort(chain_vertices)
+        return chain_vertices
     
     # calculate vertices which are in convex
     def __vertices_in_polygon(self) -> list:

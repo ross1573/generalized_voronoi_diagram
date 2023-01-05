@@ -80,6 +80,7 @@ PYTHON: 3.10.9
 |-----------------------------------------------|
 """
 
+
 from voronoi.voronoi import PolygonVoronoi, run_type
 from voronoi.geometry import *
 from voronoi.astar import Astar
@@ -162,7 +163,7 @@ def voronoi(epsilon, vor, start, end, result):
 
 if __name__ == '__main__':
     path = './testdata/'
-    file = 'testmap_3.png'
+    file = 'testmap_1.png'
     start = [0.05, 0.95]
     end = [0.95, 0.05]
     vor = image_detect(path+file, start, end)
