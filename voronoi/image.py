@@ -31,7 +31,7 @@ class PolygonDetector:
     def run(self, bound = [0.0, 0.0], triangulation = True):
         self.__contours, self.__contours_original = self.find_contours()
 
-        if bound[0] > 0.0 or bound[1] > 0.0:
+        if bound[0] > 0.0 and bound[1] > 0.0:
             self.normalize(bound)
 
         if triangulation:

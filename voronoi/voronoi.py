@@ -360,5 +360,10 @@ class PolygonVoronoi:
     def generate_plot(self) -> None:
         voronoi_plot_2d(self.__vor)
     
+    def generate_plot_only_points(self) -> None:
+        fig, ax = plt.subplots()
+        points= self.__vor.points
+        ax.plot(points[:,0], points[:,1], '.')
+    
     def show(self) -> None:
         plt.show()

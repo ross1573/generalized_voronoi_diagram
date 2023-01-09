@@ -78,6 +78,86 @@ PYTHON: 3.10.9
 |   9 |  0.0256 |   0.907 |       27 | 1.156477 | 
 |  10 |  0.0512 |   0.891 |       24 | 1.144292 | 
 |-----------------------------------------------|
+
+
+Tested environment
+------------------------
+CPU: i9-10900K
+RAM: 64GB
+OS: Windows 10 Education(21H2)
+PYTHON: 3.10.7
+    - numpy: 1.24.1
+    - scipy: 1.9.3
+    - rdp: 0.8
+------------------------
+
+|-----------------------------------------------|
+| testmap_1.png - [0.05, 0.05] > [0.9, 0.9]     |
+|-----------------------------------------------|
+| Fig | epsilon | seconds | vertices | distance |
+|-----|---------|---------|----------|----------|
+|   1 |  0.0000 |   5.065 |      413 | 1.472487 |
+|   2 |  0.0002 |   3.286 |      310 | 1.472450 |
+|   3 |  0.0004 |   1.941 |      223 | 1.472374 |
+|   4 |  0.0008 |   1.087 |      135 | 1.471773 |
+|   5 |  0.0016 |   0.828 |      103 | 1.471745 |
+|   6 |  0.0032 |   0.648 |       70 | 1.471251 |
+|   7 |  0.0064 |   0.560 |       52 | 1.471153 |
+|   8 |  0.0128 |   0.510 |       37 | 1.469695 |
+|   9 |  0.0256 |   0.506 |       33 | 1.469695 |
+|  10 |  0.0512 |   0.471 |       25 | 1.469695 |
+|-----------------------------------------------|
+
+|-----------------------------------------------|
+| testmap_3.png - [0.05, 0.05] > [0.9, 0.9]     |
+|-----------------------------------------------|
+| Fig | epsilon | seconds | vertices | distance |
+|-----|---------|---------|----------|----------|
+|   1 |  0.0000 |   6.004 |      425 | 1.449920 |
+|   2 |  0.0002 |   2.778 |      252 | 1.449840 |
+|   3 |  0.0004 |   1.633 |      179 | 1.449757 |
+|   4 |  0.0008 |   1.115 |      132 | 1.449545 |
+|   5 |  0.0016 |   0.790 |       96 | 1.449023 |
+|   6 |  0.0032 |   0.576 |       68 | 1.448546 |
+|   7 |  0.0064 |   0.520 |       55 | 1.447291 |
+|   8 |  0.0128 |   0.452 |       38 | 1.445277 |
+|   9 |  0.0256 |   0.436 |       29 | 1.440250 |
+|  10 |  0.0512 |   0.413 |       23 | 1.432812 |
+|-----------------------------------------------|
+
+|-----------------------------------------------|
+| testmap_3.png - [0.6, 0.05] > [0.4, 0.95]     |
+|-----------------------------------------------|
+| Fig | epsilon | seconds | vertices | distance |
+|-----|---------|---------|----------|----------|
+|   1 |  0.0000 |   5.838 |      399 | 1.387036 |
+|   2 |  0.0002 |   2.701 |      249 | 1.386946 |
+|   3 |  0.0004 |   1.658 |      182 | 1.386847 |
+|   4 |  0.0008 |   1.175 |      134 | 1.386651 |
+|   5 |  0.0016 |   0.770 |       93 | 1.386312 |
+|   6 |  0.0032 |   0.636 |       74 | 1.385955 |
+|   7 |  0.0064 |   0.503 |       52 | 1.384770 |
+|   8 |  0.0128 |   0.464 |       41 | 1.383525 |
+|   9 |  0.0256 |   0.430 |       28 | 1.377260 |
+|  10 |  0.0512 |   0.407 |       24 | 1.377260 |
+|-----------------------------------------------|
+
+|-----------------------------------------------|
+| testmap_3.png - [0.05, 0.6] > [0.95, 0.3]     |
+|-----------------------------------------------|
+| Fig | epsilon | seconds | vertices | distance |
+|-----|---------|---------|----------|----------|
+|   1 |  0.0000 |   4.757 |      399 | 1.161987 |
+|   2 |  0.0002 |   1.970 |      227 | 1.161941 |
+|   3 |  0.0004 |   1.309 |      170 | 1.161881 |
+|   4 |  0.0008 |   0.888 |      121 | 1.161640 |
+|   5 |  0.0016 |   0.671 |       90 | 1.161399 |
+|   6 |  0.0032 |   0.530 |       66 | 1.160908 |
+|   7 |  0.0064 |   0.491 |       49 | 1.159958 |
+|   8 |  0.0128 |   0.430 |       37 | 1.159180 |
+|   9 |  0.0256 |   0.427 |       27 | 1.156477 |
+|  10 |  0.0512 |   0.404 |       24 | 1.144292 |
+|-----------------------------------------------|
 """
 
 
@@ -110,9 +190,9 @@ def print_result(file, start, end, result):
 def image_detect(path, start, end):
     # adjustable values
     Line.point_distance = 0.015
-    Triangle.distance_trash = 0.005
+    Triangle.distance_trash = 0.02
 
-    PolygonDetector.rdp_epsilon = 0.035
+    PolygonDetector.rdp_epsilon = 0.01
     PolygonDetector.area_threshold = 400
     PolygonDetector.gray_thresh_boundary = 3
 
@@ -126,6 +206,8 @@ def image_detect(path, start, end):
     pd = PolygonDetector(path)
     pd.add_color_threshold(214)
     pd.run(bound=[1.0, 1.0])
+    pd.generate_plot()
+    pd.show()
     triangles = pd.convert_result()
 
     # voronoi
@@ -164,21 +246,30 @@ def voronoi(epsilon, vor, start, end, result):
 if __name__ == '__main__':
     path = './testdata/'
     file = 'testmap_1.png'
-    start = [0.05, 0.95]
-    end = [0.95, 0.05]
-    vor = image_detect(path+file, start, end)
-    result = []
+    start_points = [[0.05, 0.05], [0.05, 0.95], [0.55, 0.05], [0.05, 0.6]]
+    end_points = [[0.9, 0.9], [0.95, 0.05], [0.4, 0.95], [0.95, 0.45]]
 
-    voronoi(0.0000, vor, start, end, result)
-    voronoi(0.0002, vor, start, end, result)
-    voronoi(0.0004, vor, start, end, result)
-    voronoi(0.0008, vor, start, end, result)
-    voronoi(0.0016, vor, start, end, result)
-    voronoi(0.0032, vor, start, end, result)
-    voronoi(0.0064, vor, start, end, result)
-    voronoi(0.0128, vor, start, end, result)
-    voronoi(0.0256, vor, start, end, result)
-    voronoi(0.0512, vor, start, end, result)
+    for i in range(len(start_points)):
+    #for i in range(1):
+        start = start_points[i]
+        end = end_points[i]
+        #start = [0.05, 0.05]
+        #end = [0.5, 0.5]
 
-    print_result(file, start, end, result)
-    plt.show()
+        vor = image_detect(path+file, start, end)
+        result = []
+
+        voronoi(0.0000, vor, start, end, result)
+        voronoi(0.0002, vor, start, end, result)
+        voronoi(0.0004, vor, start, end, result)
+        voronoi(0.0008, vor, start, end, result)
+        voronoi(0.0016, vor, start, end, result)
+        voronoi(0.0032, vor, start, end, result)
+        voronoi(0.0064, vor, start, end, result)
+        voronoi(0.0128, vor, start, end, result)
+        voronoi(0.0256, vor, start, end, result)
+        voronoi(0.0512, vor, start, end, result)
+
+        print_result(file, start, end, result)
+        vor.generate_plot_only_points()
+        plt.show()
