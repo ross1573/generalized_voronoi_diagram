@@ -171,11 +171,11 @@ from datetime import datetime
 
 
 def print_result(file, start, end, result):
-    print('|-----------------------------------------------|')
-    print('| ' + str(file + ' - ' + str(start) + ' > ' + str(end)).ljust(45) + ' |')
-    print('|-----------------------------------------------|')
-    print('| Fig | epsilon | seconds | vertices | distance |')
-    print('|-----|---------|---------|----------|----------|')
+    print('|----------------------------------------------------------|')
+    print('| ' + str(file + ' - ' + str(start) + ' > ' + str(end)).ljust(56) + ' |')
+    print('|----------------------------------------------------------|')
+    print('| Fig | epsilon | seconds | vertices | distance | obstacle |')
+    print('|-----|---------|---------|----------|----------|----------|')
     for i in range(len(result)):
         ele = result[i]
         print('| ' + str(i+1).rjust(3) + ' |  '
@@ -183,19 +183,12 @@ def print_result(file, start, end, result):
                     + str(ele[1].seconds).rjust(3) + "." 
                     + str(int(ele[1].microseconds / 1000)).zfill(3) + ' | '
                     + str(ele[2]).rjust(8) + ' | '
-                    + '{:1.6f}'.format(ele[3]) + ' | ')
-    print('|-----------------------------------------------|')
+                    + '{:1.6f}'.format(ele[3]) + ' | '
+                    + '{:1.6f}'.format(ele[4]) + ' | ')
+    print('|----------------------------------------------------------|')
 
 
 def image_detect(path, start, end):
-    # adjustable values
-    Line.point_distance = 0.015
-    Triangle.distance_trash = 0.02
-
-    PolygonDetector.rdp_epsilon = 0.01
-    PolygonDetector.area_threshold = 400
-    PolygonDetector.gray_thresh_boundary = 3
-
     # boundary
     b1 = Line([[0.0, 0.0], [1.0, 0.0]])
     b2 = Line([[1.0, 0.0], [1.0, 1.0]])
@@ -229,21 +222,26 @@ def voronoi(epsilon, vor, start, end, result):
     # astar
     astar = Astar(vor_result, start, end)
     astar_result = astar.run()
-    astar.generate_plot()
     
     end_t = datetime.now()
+    astar.generate_plot()
     vertices_count = len(vor_result.vertices)
 
-    # total distance
-    dist = 0.0
-    for i in range(len(astar_result)-1):
-        dist += distance(astar_result[i], astar_result[i+1])
+    # distance
+    dist = total_distance(astar_result)
+    dist_obt = min_distance_from_obstacle(astar_result, vor_result.points_polygon)
 
-    result.append((epsilon, end_t - start_t, vertices_count, dist))
+    result.append((epsilon, end_t - start_t, vertices_count, dist, dist_obt))
     print('epsilon ' + str(epsilon) + ' done.')
 
 
 if __name__ == '__main__':
+    Line.point_distance = 0.015
+    Triangle.distance_trash = 0.01
+    PolygonDetector.rdp_epsilon = 0.025
+    PolygonDetector.area_threshold = 400
+    PolygonDetector.gray_thresh_boundary = 5
+
     path = './testdata/'
     file = 'testmap_1.png'
     start_points = [[0.05, 0.05], [0.05, 0.95], [0.55, 0.05], [0.05, 0.6]]
@@ -254,7 +252,7 @@ if __name__ == '__main__':
         start = start_points[i]
         end = end_points[i]
         #start = [0.05, 0.05]
-        #end = [0.5, 0.5]
+        #end = [0.05, 0.95]
 
         vor = image_detect(path+file, start, end)
         result = []

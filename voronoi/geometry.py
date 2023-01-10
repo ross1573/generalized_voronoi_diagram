@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import sys
 
 
 # get length of 2d vector
@@ -9,6 +10,39 @@ def length(vec2) -> float:
 # get distance between two 2d vectors
 def distance(_1, _2) -> float:
     return length(_1 - _2)
+
+def total_distance(path):
+    dist = 0.0
+    for i in range(len(path)-1):
+        dist += distance(path[i], path[i+1])
+    return dist
+
+def distance_between_line_point(line, point):
+    _1 = line[1] - line[0]
+    _2 = point - line[0]
+    _1_l = length(_1)
+    _2_l = length(_2)
+    
+    _d = np.dot(_1, _2)
+    if _d > _1_l * _1_l or _d < 0.0:
+        return min(_2_l, length(point - line[1]))
+    
+    _c = math.acos(_d / (_1_l * _2_l))
+    return math.sin(_c) * _2_l
+
+def min_distance_from_obstacle(path, obstacle_points):
+    min_dist = sys.float_info.max
+
+    for i in range(len(path)-1):
+        _l = np.array([path[i], path[i+1]])
+        for point in obstacle_points:
+            _p = np.array(point)
+            _d = distance_between_line_point(_l, _p)
+            if _d < min_dist:
+                min_dist = _d
+
+    return min_dist
+            
 
 # get angle between two 2d vectors
 def radian(_1, _2) -> float:

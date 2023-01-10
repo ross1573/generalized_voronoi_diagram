@@ -21,6 +21,7 @@ class Result:
     boundaries: list
     chains: list
     points: list
+    points_polygon: list
     vertices: list
     ridge_vertices: list
 
@@ -351,6 +352,7 @@ class PolygonVoronoi:
         ret_val.triangles = np.array(self.__triangles, dtype=Triangle, copy=True)
         ret_val.boundaries = np.array(self.__boundaries, dtype=Line, copy=True)
         ret_val.points = np.array(self.__vor.points, dtype=float, copy=True)
+        ret_val.points_polygon = np.array(self.__triangle_lined_points, dtype=float, copy=True)
         ret_val.vertices = np.array(self.__vor.vertices, dtype=float, copy=True)
         ret_val.ridge_vertices = np.array(self.__vor.ridge_vertices, dtype=int, copy=True)
         if len(self.__chains) > 0: 
