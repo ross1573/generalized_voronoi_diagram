@@ -1,22 +1,26 @@
 import numpy as np
-import math
-import sys
+from numba import jit, njit
+import numba.np.extensions as nbnp
 
 
 # get length of 2d vector
+@njit(cache=True, fastmath=True)
 def length(vec2) -> float:
-    return math.sqrt(pow(vec2[0], 2) + pow(vec2[1], 2))
+    return np.sqrt(pow(vec2[0], 2) + pow(vec2[1], 2))
 
 # get distance between two 2d vectors
+@njit(cache=True)
 def distance(_1, _2) -> float:
     return length(_1 - _2)
 
+@njit(cache=True, fastmath=True)
 def total_distance(path):
     dist = 0.0
     for i in range(len(path)-1):
         dist += distance(path[i], path[i+1])
     return dist
 
+@njit(cache=True, fastmath=True)
 def distance_between_line_point(line, point):
     _1 = line[1] - line[0]
     _2 = point - line[0]
@@ -27,11 +31,11 @@ def distance_between_line_point(line, point):
     if _d > _1_l * _1_l or _d < 0.0:
         return min(_2_l, length(point - line[1]))
     
-    _c = math.acos(_d / (_1_l * _2_l))
-    return math.sin(_c) * _2_l
+    _c = np.arccos(_d / (_1_l * _2_l))
+    return np.sin(_c) * _2_l
 
 def min_distance_from_obstacle(path, obstacle_points):
-    min_dist = sys.float_info.max
+    min_dist = np.finfo(np.float64).max
 
     for i in range(len(path)-1):
         _l = np.array([path[i], path[i+1]])
@@ -45,20 +49,23 @@ def min_distance_from_obstacle(path, obstacle_points):
             
 
 # get angle between two 2d vectors
+@njit(cache=True, fastmath=True)
 def radian(_1, _2) -> float:
     _1_n = _1 / length(_1)
     _2_n = _2 / length(_2)
     dot = np.dot(_1_n, _2_n)
     if dot > 1.0: dot = 1.0
-    return math.acos(dot)
+    return np.arccos(dot)
 
 # get closest(but smaller) value index on vector
+@njit(cache=True)
 def find_closest(vec, ele) -> int:
     for i in range(len(vec)):
         if vec[i] > ele:
             return i
     return len(vec)
 
+@njit(cache=True, fastmath=True)
 def counter_clockwise(_1, _2, _3) -> int:
         # vector ab
         v_1 = _2 - _1
@@ -66,7 +73,8 @@ def counter_clockwise(_1, _2, _3) -> int:
         v_2 = _3 - _1
 
         # vector ab x ac
-        cross = np.cross(v_1, v_2)
+        #cross = np.cross(v_1, v_2)
+        cross = nbnp.cross2d(v_1, v_2)
 
         # if cross > 0 than it's ccw
         if cross > 0: return 1
@@ -74,6 +82,7 @@ def counter_clockwise(_1, _2, _3) -> int:
         elif cross == 0: return 0
         # if cross < 0 than it's cw
         return -1
+
 
 # line class
 class Line:
@@ -104,12 +113,14 @@ class Line:
         return result
         
     def __generate_line_x(self, _1, _2) -> list:
-        return self.__generate_line_base(_1, _2, 0)
+        return self.__generate_line_base(_1, _2, 0, self.point_distance)
     
     def __generate_line_y(self, _1, _2) -> list:
-        return self.__generate_line_base(_1, _2, 1)
+        return self.__generate_line_base(_1, _2, 1, self.point_distance)
     
-    def __generate_line_base(self, _1, _2, axis):
+    @staticmethod
+    @jit(nopython=False, forceobj=True)
+    def __generate_line_base(_1, _2, axis, point_distance):
         result = []
 
         # if vec_1[axis] > vec_2[axis] then swap
@@ -120,7 +131,7 @@ class Line:
         # one step equals to distance between two points
         dis = distance(_1, _2)
         step_vec = (_2 - _1) / dis
-        step_vec *= self.point_distance
+        step_vec *= point_distance
 
         # initialize to first point
         current = np.array(_1)
@@ -161,33 +172,41 @@ class Triangle(Line):
     # test if point is in triangle
     def is_in_polygon(self, point) -> bool:
         # if point is close enough, filter out
-        if self._test_distance_trash(point):
+        if self.__test_distance_trash(self.points, point, self.distance_trash):
             return True
 
-        # loop for every vertex in Triangle
-        for i in range(3):
-            # vector ab
-            l_1 = self.points[(i+1)%3] - self.points[i]
-            # vector ac
-            l_2 = self.points[(i+2)%3] - self.points[i]
-            # vector ap
-            l_3 = point - self.points[i]
-
-            # ab x ap
-            c_1 = np.cross(l_1, l_3)
-            # ap x ac
-            c_2 = np.cross(l_3, l_2)
-
-            # if (ab x ap) * (ap x ac) < 0 than the point is in convex
-            if np.dot(c_1, c_2) <= 0.0:
-                return False
-        return True
+        return self.__test_point_convex(self.points, point)
 
     # test if a point is close enough to vertex
     # test value is self._distance_trash
-    def _test_distance_trash(self, point) -> bool:
+    @staticmethod
+    @njit(cache=True)
+    def __test_distance_trash(points, test_point, distance_trash) -> bool:
         for i in range(3):
-            dis = distance(point, self.points[i])
-            if dis < self.distance_trash:
+            dis = distance(test_point, points[i])
+            if dis < distance_trash:
                 return True
         return False
+
+    @staticmethod
+    @njit(cache=True, fastmath=True)
+    def __test_point_convex(points, test_point) -> bool:
+        for i in range(3):
+            # vector ab
+            l_1 = points[(i+1)%3] - points[i]
+            # vector ac
+            l_2 = points[(i+2)%3] - points[i]
+            # vector ap
+            l_3 = test_point - points[i]
+
+            # ab x ap
+            #c_1 = np.cross(l_1, l_3)
+            c_1 = nbnp.cross2d(l_1, l_3)
+            # ap x ac
+            #c_2 = np.cross(l_3, l_2)
+            c_2 = nbnp.cross2d(l_3, l_2)
+
+            # if (ab x ap) * (ap x ac) < 0 than the point is in convex
+            if c_1 * c_2 <= 0.0:
+                return False
+        return True

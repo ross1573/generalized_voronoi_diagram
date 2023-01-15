@@ -1,4 +1,3 @@
-import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from rdp import rdp
@@ -310,7 +309,7 @@ class PolygonVoronoi:
                     in_polygon.append(i)
                     break
 
-        return in_polygon
+        return np.array(in_polygon)
 
     # calculate ridges which are related to deleted vertices and outside
     def __ridges_to_delete(self, vertex_vec) -> list:
