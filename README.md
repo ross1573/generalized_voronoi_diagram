@@ -7,8 +7,10 @@ python
     - matplotlib  
     - scipy  
     - rdp  
-    - opencv-python
-    - numba
+    - opencv-python  
+    - numba  
+    - tripy  
+    - pyvisgraph  
 ~~~
 -----  
   
