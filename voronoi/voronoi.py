@@ -83,7 +83,7 @@ class PolygonVoronoi:
                            self.__points)
         return self.__generate_result()
     
-    def run_non_optimized(self) -> Result:
+    def run_non_optimized(self, generate_result=True) -> Result:
         # run voronoi
         self.__run_voronoi(self.__boundary_lined_points + 
                            self.__triangle_lined_points +
@@ -100,11 +100,12 @@ class PolygonVoronoi:
         # reorganize ridge vertices
         self.__reorganize_ridge(unreachable_vertices)
 
-        return self.__generate_result()
+        if generate_result:
+            return self.__generate_result()
 
     def run_optimized(self) -> Result:
         # run voronoi
-        self.run_non_optimized()
+        self.run_non_optimized(False)
 
         # generate chains in voronoi diagram
         self.__chains = self.__generate_chains()
@@ -348,10 +349,10 @@ class PolygonVoronoi:
 
     def __generate_result(self) -> Result:
         ret_val = Result()
-        ret_val.triangles = np.array(self.__triangles, dtype=Triangle, copy=True)
-        ret_val.boundaries = np.array(self.__boundaries, dtype=Line, copy=True)
-        ret_val.points = np.array(self.__vor.points, dtype=float, copy=True)
-        ret_val.points_polygon = np.array(self.__triangle_lined_points, dtype=float, copy=True)
+        ret_val.triangles = np.array(self.__triangles, dtype=Triangle, copy=False)
+        ret_val.boundaries = np.array(self.__boundaries, dtype=Line, copy=False)
+        ret_val.points = np.array(self.__vor.points, dtype=float, copy=False)
+        ret_val.points_polygon = np.array(self.__triangle_lined_points, dtype=float, copy=False)
         ret_val.vertices = np.array(self.__vor.vertices, dtype=float, copy=True)
         ret_val.ridge_vertices = np.array(self.__vor.ridge_vertices, dtype=int, copy=True)
         if len(self.__chains) > 0: 

@@ -46,7 +46,6 @@ def min_distance_from_obstacle(path, obstacle_points):
                 min_dist = _d
 
     return min_dist
-            
 
 # get angle between two 2d vectors
 @njit(cache=True, fastmath=True)
@@ -73,7 +72,6 @@ def counter_clockwise(_1, _2, _3) -> int:
         v_2 = _3 - _1
 
         # vector ab x ac
-        #cross = np.cross(v_1, v_2)
         cross = nbnp.cross2d(v_1, v_2)
 
         # if cross > 0 than it's ccw
@@ -200,10 +198,8 @@ class Triangle(Line):
             l_3 = test_point - points[i]
 
             # ab x ap
-            #c_1 = np.cross(l_1, l_3)
             c_1 = nbnp.cross2d(l_1, l_3)
             # ap x ac
-            #c_2 = np.cross(l_3, l_2)
             c_2 = nbnp.cross2d(l_3, l_2)
 
             # if (ab x ap) * (ap x ac) < 0 than the point is in convex

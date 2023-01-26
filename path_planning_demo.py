@@ -7,12 +7,12 @@ from voronoi.image import PolygonDetector
 if __name__ == '__main__':
     # adjustable values
     Line.point_distance = 0.02
-    Triangle.distance_trash = 0.04
+    Triangle.distance_trash = 0.02
 
     PolygonVoronoi.rdp_epsilon = 0.01
-    PolygonDetector.rdp_epsilon = 0.035
+    PolygonDetector.rdp_epsilon = 0.01
     PolygonDetector.area_threshold = 400
-    PolygonDetector.gray_thresh_boundary = 3
+    PolygonDetector.gray_thresh_boundary = 5
 
     # boundary
     b1 = Line([[0.0, 0.0], [1.0, 0.0]])
@@ -25,8 +25,7 @@ if __name__ == '__main__':
     end = [0.9, 0.9]
 
     # polygon detector
-    pd = PolygonDetector('./testdata/testmap_3.png')
-    pd.add_color_threshold(214)
+    pd = PolygonDetector('./testdata/map0.png', [214, 255])
     pd.run(bound=[1.0, 1.0])
     triangles = pd.convert_result()
 

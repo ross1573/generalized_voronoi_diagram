@@ -1,8 +1,6 @@
 import cv2
-import sys
-import numpy as np
 import matplotlib.pyplot as plt
-from scipy.spatial import Delaunay
+import tripy
 
 from voronoi.geometry import Triangle
 
@@ -69,12 +67,12 @@ class PolygonDetector:
         triangles = []
 
         for contour in self.__contours:
-            tri_obj = Delaunay(contour)
-            for tri in tri_obj.vertices:
-                points = []
-                for vertex in tri:
-                    points.append(contour[vertex])
-                triangles.append(points)
+            triangulation = tripy.earclip(contour)
+            for triangle in triangulation:
+                vertices = []
+                for vertex in triangle:
+                    vertices.append(list(vertex))
+                triangles.append(vertices)
 
         return triangles
 
