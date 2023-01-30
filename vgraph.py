@@ -7,15 +7,28 @@ import pyvisgraph as vg
 def image_detect(path):
     # polygon detector
     pd = PolygonDetector(path, [214, 255])
-    result = pd.run(bound=[1.0, 1.0], triangulation=False)
+    pd_result = pd.run(bound=[1.0, 1.0], triangulation=False)
+    pd.generate_plot()
+    pd.show()
 
-    return result
+    poly = []
+    for ele in pd_result:
+        p = []
+        for vertex in ele:
+            p.append(vg.Point(vertex[0], vertex[1]))                
+    poly.append(p)
+
+    return poly
 
 
 if __name__ == '__main__':
-    map = 4
+    map = 0
 
-    if map == 1:
+    if map == 0:
+        PolygonDetector.rdp_epsilon = 0.01
+        PolygonDetector.area_threshold = 400
+        PolygonDetector.gray_thresh_boundary = 3
+    elif map == 1:
         PolygonDetector.rdp_epsilon = 0.025
         PolygonDetector.area_threshold = 400
         PolygonDetector.gray_thresh_boundary = 5
@@ -27,8 +40,20 @@ if __name__ == '__main__':
         PolygonDetector.rdp_epsilon = 0.01
         PolygonDetector.area_threshold = 400
         PolygonDetector.gray_thresh_boundary = 3
+    elif map == 4:
+        PolygonDetector.rdp_epsilon = 0.001
+        PolygonDetector.area_threshold = 400
+        PolygonDetector.gray_thresh_boundary = 15
+    elif map == 5:
+        PolygonDetector.rdp_epsilon = 0.005
+        PolygonDetector.area_threshold = 400
+        PolygonDetector.gray_thresh_boundary = 5
+    elif map == 6:
+        PolygonDetector.rdp_epsilon = 0.0005
+        PolygonDetector.area_threshold = 400
+        PolygonDetector.gray_thresh_boundary = 15
 
-    path_str = './testdata/'
+    path_str = './testdata/vgraph/'
     file_str = 'map' + str(map) + '.png'
     start_points = [[0.05, 0.05], [0.05, 0.95], [0.55, 0.05], [0.05, 0.6]]
     end_points = [[0.9, 0.9], [0.95, 0.05], [0.4, 0.95], [0.95, 0.45]]
@@ -37,44 +62,17 @@ if __name__ == '__main__':
         if map == 4:
             start = [0.05, 0.05]
             end = [0.05, 0.95]
-            poly = [[vg.Point(0.832, 0.792),
-                 vg.Point(0.217, 0.776),
-                 vg.Point(0.224, 0.190),
-                 vg.Point(0.810, 0.185),
-                 vg.Point(0.810, 0.622),
-                 vg.Point(0.381, 0.622),
-                 vg.Point(0.370, 0.417),
-                 vg.Point(0.680, 0.420),
-                 vg.Point(0.680, 0.370),
-                 vg.Point(0.337, 0.370),
-                 vg.Point(0.337, 0.670),
-                 vg.Point(0.840, 0.670),
-                 vg.Point(0.842, 0.140),
-                 vg.Point(0.165, 0.140),
-                 vg.Point(0.165, 0.835),
-                 vg.Point(0.785, 0.834)]]
         elif map == 5:
             start = [0.05, 0.05]
             end = [0.5, 0.5]
-            # TODO
-            poly = [[]]
         elif map == 6:
             start = [0.05, 0.95]
             end = [0.95, 0.05]
-            # TODO
-            poly = [[]]
         else:
             start = start_points[i]
             end = end_points[i]
 
-            image_poly = image_detect(path_str+file_str)
-            poly = []
-            for ele in image_poly:
-                p = []
-                for vertex in ele:
-                    p.append(vg.Point(vertex[0], vertex[1]))                
-            poly.append(p)
-
+        poly = image_detect(path_str+file_str)
         g = vg.VisGraph()
         g.build(poly)
         start_point = vg.Point(start[0], start[1])

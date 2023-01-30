@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 
 
-def print_result(file, start, end, result):
+def print_result(file, start, end, result, show=True):
     print('|----------------------------------------------------------|')
     print('| ' + str(file + ' - ' + str(start) + ' > ' + str(end)).ljust(56) + ' |')
     print('|----------------------------------------------------------|')
@@ -23,9 +23,11 @@ def print_result(file, start, end, result):
                     + '{:1.6f}'.format(ele[3]) + ' | '
                     + '{:1.6f}'.format(ele[4]) + ' | ')
     print('|----------------------------------------------------------|')
+    if show:
+        plt.show()
 
 
-def image_detect(path, start, end):
+def image_detect(path, start, end, show=True):
     # boundary
     b1 = Line([[0.0, 0.0], [1.0, 0.0]])
     b2 = Line([[1.0, 0.0], [1.0, 1.0]])
@@ -35,8 +37,9 @@ def image_detect(path, start, end):
     # polygon detector
     pd = PolygonDetector(path, [214, 255])
     pd.run(bound=[1.0, 1.0])
-    #pd.generate_plot()
-    #pd.show()
+    if show:
+        pd.generate_plot()
+        pd.show()
     triangles = pd.convert_result()
 
     # voronoi
@@ -48,7 +51,7 @@ def image_detect(path, start, end):
     return vor
 
 
-def voronoi(epsilon, vor, start, end, result):
+def voronoi(epsilon, vor, start, end, result, show=True):
     PolygonVoronoi.rdp_epsilon = epsilon
     start_t = datetime.now()
 
@@ -60,7 +63,8 @@ def voronoi(epsilon, vor, start, end, result):
     astar_result = astar.run()
     
     end_t = datetime.now()
-    astar.generate_plot()
+    if show:
+        astar.generate_plot()
     vertices_count = len(vor_result.vertices)
 
     # distance
@@ -75,7 +79,7 @@ if __name__ == '__main__':
     Line.point_distance = 0.015
     Triangle.distance_trash = 0.01
 
-    map = 6
+    map = 0
 
     if map == 0:
         PolygonDetector.rdp_epsilon = 0.01
@@ -106,7 +110,7 @@ if __name__ == '__main__':
         PolygonDetector.area_threshold = 400
         PolygonDetector.gray_thresh_boundary = 5
 
-    path = './testdata/'
+    path = './testdata/voronoi/'
     file = 'map' + str(map) + '.png'
     start_points = [[0.05, 0.05], [0.05, 0.95], [0.55, 0.05], [0.05, 0.6]]
     end_points = [[0.9, 0.9], [0.95, 0.05], [0.4, 0.95], [0.95, 0.45]]
@@ -125,22 +129,21 @@ if __name__ == '__main__':
             start = start_points[i]
             end = end_points[i]
 
-        vor = image_detect(path+file, start, end)
+        vor = image_detect(path+file, start, end, False)
         result = []
 
-        voronoi(0.0000, vor, start, end, result)
-        voronoi(0.0002, vor, start, end, result)
-        voronoi(0.0004, vor, start, end, result)
-        voronoi(0.0008, vor, start, end, result)
-        voronoi(0.0016, vor, start, end, result)
-        voronoi(0.0032, vor, start, end, result)
-        voronoi(0.0064, vor, start, end, result)
-        voronoi(0.0128, vor, start, end, result)
-        voronoi(0.0256, vor, start, end, result)
-        voronoi(0.0512, vor, start, end, result)
+        #voronoi(0.0000, vor, start, end, result, False)
+        #voronoi(0.0002, vor, start, end, result, False)
+        #voronoi(0.0004, vor, start, end, result, False)
+        #voronoi(0.0008, vor, start, end, result, False)
+        #voronoi(0.0016, vor, start, end, result, False)
+        #voronoi(0.0032, vor, start, end, result, False)
+        voronoi(0.0064, vor, start, end, result, False)
+        #voronoi(0.0128, vor, start, end, result, False)
+        #voronoi(0.0256, vor, start, end, result, False)
+        #voronoi(0.0512, vor, start, end, result, False)
 
-        print_result(file, start, end, result)
-        vor.generate_plot_only_points()
-        plt.show()
+        #vor.generate_plot_only_points()
+        print_result(file, start, end, result, False)
 
         if map > 3: break
