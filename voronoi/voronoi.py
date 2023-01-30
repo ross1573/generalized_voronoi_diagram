@@ -107,30 +107,12 @@ class PolygonVoronoi:
         # run voronoi
         self.run_non_optimized(False)
 
-        # generate chains in voronoi diagram
-        self.__chains = self.__generate_chains()
-        vertex_chains = self.__generate_vertex_chains(self.__chains)
+        if not self.__optimize_line():
+            print("Unable to optimize voronoi diagram")
+            return self.__generate_result()
 
-        # unoptimizable case
-        if self.__chains == []: return self.__vor
-
-        # optimize line
-        optimized_chains = self.__optimize_line(vertex_chains)
-
-        # regenerate ridges
-        self.__regenerate_voronoi(optimized_chains)
-
-        # regenerate chain by optimized value
-        self.__chains = self.__generate_chains()
-
-        # calculate unfinished vertices and ridges
-        unfinised_vertices = self.__unfinished_vertices()
-        ridge_to_delete = self.__ridges_to_delete(unfinised_vertices)
-
-        # delete unfinished vertices and ridges
-        self.__delete_vertex(unfinised_vertices)
-        self.__delete_ridge(ridge_to_delete)
-        self.__reorganize_ridge(unfinised_vertices)
+        self.__delete_unfinished()
+        self.__optimize_line()
 
         return self.__generate_result()
 
@@ -143,7 +125,28 @@ class PolygonVoronoi:
         return result
 
     # optimize line using Ramer-Douglas-Peucker algorithm
-    def __optimize_line(self, chains) -> list:
+    def __optimize_line(self) -> bool:
+         # generate chains in voronoi diagram
+        self.__chains = self.__generate_chains()
+
+        if len(self.__chains) == 0:
+            return False
+        
+        # generate vertex chains based on chains
+        vertex_chains = self.__generate_vertex_chains(self.__chains)
+
+        # unoptimizable case
+        if self.__chains == []: return self.__vor
+
+        # optimize line
+        optimized_chains = self.__optimize_line_base(vertex_chains)
+
+        # regenerate ridges
+        self.__regenerate_voronoi(optimized_chains)
+
+        return True
+
+    def __optimize_line_base(self, chains) -> list:
         optimized_chains = []
         for chain in chains:
             optimized_chains.append(rdp(chain, epsilon=self.rdp_epsilon))
@@ -186,7 +189,6 @@ class PolygonVoronoi:
 
         # voronoi diagram with no dead end point cannot be optimized
         if (ignition_idx == -1):
-            print("Unable to optimize voronoi diagram")
             return []
 
         # generate chains
@@ -277,6 +279,19 @@ class PolygonVoronoi:
             if neighbor[i] in visited: continue
             new_start_points.append([idx[1], neighbor[i]])
         return new_start_points
+
+    def __delete_unfinished(self) -> None:
+        # regenerate chain by optimized value
+        self.__chains = self.__generate_chains()
+
+        # calculate unfinished vertices and ridges
+        unfinised_vertices = self.__unfinished_vertices()
+        ridge_to_delete = self.__ridges_to_delete(unfinised_vertices)
+
+        # delete unfinished vertices and ridges
+        self.__delete_vertex(unfinised_vertices)
+        self.__delete_ridge(ridge_to_delete)
+        self.__reorganize_ridge(unfinised_vertices)
     
     # calculate vertices which is unfinished
     def __unfinished_vertices(self) -> list:

@@ -79,7 +79,7 @@ if __name__ == '__main__':
     Line.point_distance = 0.015
     Triangle.distance_trash = 0.01
 
-    map = 0
+    map = 3
 
     if map == 0:
         PolygonDetector.rdp_epsilon = 0.01
@@ -132,18 +132,20 @@ if __name__ == '__main__':
         vor = image_detect(path+file, start, end, False)
         result = []
 
-        #voronoi(0.0000, vor, start, end, result, False)
-        #voronoi(0.0002, vor, start, end, result, False)
-        #voronoi(0.0004, vor, start, end, result, False)
-        #voronoi(0.0008, vor, start, end, result, False)
-        #voronoi(0.0016, vor, start, end, result, False)
-        #voronoi(0.0032, vor, start, end, result, False)
-        voronoi(0.0064, vor, start, end, result, False)
-        #voronoi(0.0128, vor, start, end, result, False)
-        #voronoi(0.0256, vor, start, end, result, False)
-        #voronoi(0.0512, vor, start, end, result, False)
+        voronoi(0.0000, vor, start, end, result, False)
+        voronoi(0.0002, vor, start, end, result, False)
+        voronoi(0.0004, vor, start, end, result, False)
+        voronoi(0.0008, vor, start, end, result, False)
+        voronoi(0.0016, vor, start, end, result, False)
+        voronoi(0.0032, vor, start, end, result, False)
+        voronoi(0.0064, vor, start, end, result, True)
+        voronoi(0.0128, vor, start, end, result, False)
+        voronoi(0.0256, vor, start, end, result, False)
+        voronoi(0.0512, vor, start, end, result, False)
 
         #vor.generate_plot_only_points()
         print_result(file, start, end, result, False)
 
         if map > 3: break
+    
+    plt.show()
