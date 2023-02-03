@@ -31,13 +31,17 @@ class GeneralizedVoronoi:
 
     def __init__(self) -> None:
         self.__points = []
+        self.__lines = []
         self.__triangles = []
         self.__boundaries = []
 
         self.__triangle_points = []
         self.__boudnary_points = []
+        self.__line_points = []
+
         self.__triangle_lined_points = []
         self.__boundary_lined_points = []
+        self.__line_lined_points = []
 
         self.__chains = []
 
@@ -47,6 +51,16 @@ class GeneralizedVoronoi:
     def add_points(self, points: list) -> None:
         for point in points:
             self.add_point(point)
+
+    def add_line(self, line: Line) -> None:
+        self.__lines.append(line)
+        self.__line_lined_points += line.generate_line()
+        for ele in line.points:
+            self.__line_points.append(ele)
+    
+    def add_lines(self, lines: list[Line]) -> None:
+        for line in lines:
+            self.add_line(line)
     
     def add_triangle(self, triangle: Triangle) -> None:
         self.__triangles.append(triangle)
@@ -67,6 +81,15 @@ class GeneralizedVoronoi:
     def add_boundaries(self, boundaries: list[Line]) -> None:
         for boundary in boundaries:
             self.add_boundary(boundary)
+    
+    def add_polygon(self, polygon: list) -> None:
+        triangles = triangulation(polygon)
+        for vertices in triangles:
+            self.add_triangle(Triangle(vertices))
+    
+    def add_polygons(self, polygons: list) -> None:
+        for polygon in polygons:
+            self.add_polygon(polygon)
 
     def __run_voronoi(self, points) -> None:
         self.__vor = Voronoi(points=points)
@@ -74,12 +97,14 @@ class GeneralizedVoronoi:
     def run_non_lined(self) -> Result:
         self.__run_voronoi(self.__boudnary_points + 
                            self.__triangle_points +
+                           self.__line_points +
                            self.__points)
         return self.__generate_result()
     
     def run_non_deleted(self) -> Result:
         self.__run_voronoi(self.__boundary_lined_points + 
                            self.__triangle_lined_points +
+                           self.__line_lined_points + 
                            self.__points)
         return self.__generate_result()
     
@@ -87,6 +112,7 @@ class GeneralizedVoronoi:
         # run voronoi
         self.__run_voronoi(self.__boundary_lined_points + 
                            self.__triangle_lined_points +
+                           self.__line_lined_points +
                            self.__points)
 
         # calculate unreachable vertices and ridges
@@ -330,6 +356,7 @@ class GeneralizedVoronoi:
     # calculate ridges which are related to deleted vertices and outside
     def __ridges_to_delete(self, vertex_vec) -> list:
         to_delete = []
+        vertices = self.__vor.vertices
 
         for i in range(len(self.__vor.ridge_vertices)):
             rv = self.__vor.ridge_vertices[i]
@@ -340,8 +367,18 @@ class GeneralizedVoronoi:
                 continue
 
             # if ridge contains deleted vertex, delete ridge
+            deleted = False
             for ver in vertex_vec:
                 if rv[0] == ver or rv[1] == ver:
+                    to_delete.append(i)
+                    deleted = True
+                    break
+            if deleted: continue
+
+            # if ridge intersects with line, delete ridge
+            for line in self.__lines:
+                l_2 = [vertices[rv[0]], vertices[rv[1]]]
+                if line.is_intersecting(l_2):
                     to_delete.append(i)
                     break
         

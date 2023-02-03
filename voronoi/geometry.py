@@ -1,6 +1,7 @@
 import numpy as np
 from numba import jit, njit
 import numba.np.extensions as nbnp
+import tripy
 
 
 # get length of 2d vector
@@ -81,6 +82,15 @@ def counter_clockwise(_1, _2, _3) -> int:
         # if cross < 0 than it's cw
         return -1
 
+@njit(cache=True, fastmath=True)
+def is_intersecting(_1, _2) -> bool:
+    # ccw(p1, p2, p3) * ccw(p1, p2, p4)
+    if counter_clockwise(_1[0], _1[1], _2[0]) * counter_clockwise(_1[0], _1[1], _2[1]) < 0:
+        # ccw(p3, p4, p1) * ccw(p3, p4, p2)
+        if counter_clockwise(_2[0], _2[1], _1[0]) * counter_clockwise(_2[0], _2[1], _1[1]) < 0:
+            return True
+    return False
+
 
 # line class
 class Line:
@@ -141,6 +151,10 @@ class Line:
             current += step_vec
         
         return result
+
+    def is_intersecting(self, line) -> bool:
+        return is_intersecting(self.points, line)
+
 
 
 # triangle class
@@ -206,3 +220,14 @@ class Triangle(Line):
             if c_1 * c_2 <= 0.0:
                 return False
         return True
+
+
+def triangulation(polygon) -> list[Triangle]:
+    triangles = []
+    triangulation = tripy.earclip(polygon)
+    for triangle in triangulation:
+        vertices = []
+        for vertex in triangle:
+            vertices.append(list(vertex))
+        triangles.append(vertices)
+    return triangles

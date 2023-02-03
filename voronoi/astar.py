@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 from queue import PriorityQueue
 from matplotlib.collections import LineCollection
-from numba import njit
 
 from voronoi.voronoi import Result
 from voronoi.dictionary import IndexDict
@@ -110,22 +109,11 @@ class Astar:
                 if i in ridge: continue
                 _1 = np.array([point, vertices[i]])
                 _2 = np.array([vertices[ridge[0]], vertices[ridge[1]]])
-                if self.__is_intersecting(_1, _2):
+                if is_intersecting(_1, _2):
                     intersecting = True
                     break
             if not intersecting: adjacent.append(i)
         return adjacent
-
-    # find out whether two lines are intersecting
-    @staticmethod
-    @njit(cache=True)
-    def __is_intersecting(_1, _2) -> bool:
-        # ccw(p1, p2, p3) * ccw(p1, p2, p4)
-        if counter_clockwise(_1[0], _1[1], _2[0]) * counter_clockwise(_1[0], _1[1], _2[1]) < 0:
-            # ccw(p3, p4, p1) * ccw(p3, p4, p2)
-            if counter_clockwise(_2[0], _2[1], _1[0]) * counter_clockwise(_2[0], _2[1], _1[1]) < 0:
-                return True
-        return False
 
     def generate_plot(self) -> None:
         fig, ax = plt.subplots()
