@@ -1,4 +1,4 @@
-from voronoi.voronoi import PolygonVoronoi, run_type
+from voronoi.voronoi import GeneralizedVoronoi, run_type
 from voronoi.geometry import Line, Triangle
 from voronoi.astar import Astar
 from voronoi.image import PolygonDetector
@@ -9,7 +9,7 @@ if __name__ == '__main__':
     Line.point_distance = 0.02
     Triangle.distance_trash = 0.02
 
-    PolygonVoronoi.rdp_epsilon = 0.01
+    GeneralizedVoronoi.rdp_epsilon = 0.01
     PolygonDetector.rdp_epsilon = 0.01
     PolygonDetector.area_threshold = 400
     PolygonDetector.gray_thresh_boundary = 5
@@ -30,7 +30,7 @@ if __name__ == '__main__':
     triangles = pd.convert_result()
 
     # voronoi
-    vor = PolygonVoronoi()
+    vor = GeneralizedVoronoi()
     vor.add_triangles(triangles)
     vor.add_boundaries([b1, b2, b3, b4])
     vor.add_points([start, end])

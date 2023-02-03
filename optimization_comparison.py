@@ -1,4 +1,4 @@
-from voronoi.voronoi import PolygonVoronoi, run_type
+from voronoi.voronoi import GeneralizedVoronoi
 from voronoi.geometry import *
 from voronoi.astar import Astar
 from voronoi.image import PolygonDetector
@@ -43,7 +43,7 @@ def image_detect(path, start, end, show=True):
     triangles = pd.convert_result()
 
     # voronoi
-    vor = PolygonVoronoi()
+    vor = GeneralizedVoronoi()
     vor.add_triangles(triangles)
     vor.add_boundaries([b1, b2, b3, b4])
     vor.add_points([start, end])
@@ -52,7 +52,7 @@ def image_detect(path, start, end, show=True):
 
 
 def voronoi(epsilon, vor, start, end, result, show=True):
-    PolygonVoronoi.rdp_epsilon = epsilon
+    GeneralizedVoronoi.rdp_epsilon = epsilon
     start_t = datetime.now()
 
     # voronoi

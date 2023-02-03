@@ -26,7 +26,7 @@ class Result:
 
 
 # polygon based voronoi diagram
-class PolygonVoronoi:
+class GeneralizedVoronoi:
     rdp_epsilon: float
 
     def __init__(self) -> None:

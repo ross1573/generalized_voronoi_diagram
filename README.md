@@ -1,4 +1,4 @@
-# Polygon based voronoi diagram
+# Generalized voronoi diagram
 
 ### Requirments
 ~~~
