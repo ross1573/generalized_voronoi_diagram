@@ -1,4 +1,8 @@
-# Generalized voronoi diagram
+# Generalized voronoi diagram  
+A generalized voronoi diagram for python.  
+Supports points, lines, polygons on generation.  
+
+-----  
 
 ### Requirments
 ~~~
@@ -15,9 +19,6 @@ python
 -----  
   
 ### Path planning demo result
-* polygon detected result  
-  <img src="./result/polygon_detect_result.png" width="430px" height="360px">
-
 * non polygon lined(normal point based voronoi diagram)  
   <img src="./result/non_lined_result.png" width="430px" height="360px">
 
