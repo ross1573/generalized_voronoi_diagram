@@ -35,12 +35,15 @@ def distance_between_line_point(line, point):
     _c = np.arccos(_d / (_1_l * _2_l))
     return np.sin(_c) * _2_l
 
-def min_distance_from_obstacle(path, obstacle_points):
+def min_distance_from_obstacle(vor):
     min_dist = np.finfo(np.float64).max
+    vertices = vor.vertices
+    ridges = vor.ridge_vertices
+    points = vor.points_polygon
 
-    for i in range(len(path)-1):
-        _l = np.array([path[i], path[i+1]])
-        for point in obstacle_points:
+    for ridge in ridges:
+        _l = np.array([vertices[ridge[0]], vertices[ridge[1]]])
+        for point in points:
             _p = np.array(point)
             _d = distance_between_line_point(_l, _p)
             if _d < min_dist:

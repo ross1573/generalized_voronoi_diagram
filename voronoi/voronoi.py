@@ -133,12 +133,10 @@ class GeneralizedVoronoi:
         # run voronoi
         self.run_non_optimized(False)
 
-        if not self.__optimize_line():
-            print("Unable to optimize voronoi diagram")
-            return self.__generate_result()
-
-        self.__delete_unfinished()
-        self.__optimize_line()
+        while True:
+            if not self.__optimize_line():
+                break
+            self.__delete_unfinished()
 
         return self.__generate_result()
 

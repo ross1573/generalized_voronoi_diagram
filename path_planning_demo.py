@@ -6,19 +6,20 @@ from voronoi.image import PolygonDetector
 
 if __name__ == '__main__':
     # adjustable values
-    Line.point_distance = 0.02
+    Line.point_distance = 0.015
     Triangle.distance_trash = 0.02
 
-    GeneralizedVoronoi.rdp_epsilon = 0.01
+    GeneralizedVoronoi.rdp_epsilon = 0.0064
     PolygonDetector.rdp_epsilon = 0.01
     PolygonDetector.area_threshold = 400
-    PolygonDetector.gray_thresh_boundary = 5
+    PolygonDetector.gray_thresh_boundary = 3
 
     # boundary
     b1 = Line([[0.0, 0.0], [1.0, 0.0]])
     b2 = Line([[1.0, 0.0], [1.0, 1.0]])
     b3 = Line([[1.0, 1.0], [0.0, 1.0]])
     b4 = Line([[0.0, 0.0], [0.0, 1.0]])
+    line = Line([[0.1, 0.2], [0.2, 0.1]])
 
     #point
     start = [0.05, 0.05]
@@ -26,13 +27,13 @@ if __name__ == '__main__':
 
     # polygon detector
     pd = PolygonDetector('./testdata/voronoi/map0.png', [214, 255])
-    pd.run(bound=[1.0, 1.0])
-    triangles = pd.convert_result()
+    polygons = pd.run(bound=[1.0, 1.0])
 
     # voronoi
     vor = GeneralizedVoronoi()
-    vor.add_triangles(triangles)
+    vor.add_polygons(polygons)
     vor.add_boundaries([b1, b2, b3, b4])
+    vor.add_line(line)
     vor.add_points([start, end])
     vor.run(run_type.non_lined)
     vor.run(run_type.non_deleted)

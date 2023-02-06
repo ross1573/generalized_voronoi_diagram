@@ -4,12 +4,13 @@ from voronoi.geometry import *
 import pyvisgraph as vg
 
 
-def image_detect(path):
+def image_detect(path, show):
     # polygon detector
     pd = PolygonDetector(path, [214, 255])
     pd_result = pd.run(bound=[1.0, 1.0], triangulation=False)
-    pd.generate_plot()
-    pd.show()
+    if show:
+        pd.generate_plot()
+        pd.show()
 
     poly = []
     for ele in pd_result:
@@ -53,7 +54,7 @@ if __name__ == '__main__':
         PolygonDetector.area_threshold = 400
         PolygonDetector.gray_thresh_boundary = 15
 
-    path_str = './testdata/vgraph/'
+    path_str = './testdata/'
     file_str = 'map' + str(map) + '.png'
     start_points = [[0.05, 0.05], [0.05, 0.95], [0.55, 0.05], [0.05, 0.6]]
     end_points = [[0.9, 0.9], [0.95, 0.05], [0.4, 0.95], [0.95, 0.45]]
@@ -72,7 +73,7 @@ if __name__ == '__main__':
             start = start_points[i]
             end = end_points[i]
 
-        poly = image_detect(path_str+file_str)
+        poly = image_detect(path_str+file_str, False)
         g = vg.VisGraph()
         g.build(poly)
         start_point = vg.Point(start[0], start[1])
