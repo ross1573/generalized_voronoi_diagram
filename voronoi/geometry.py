@@ -207,20 +207,8 @@ class Triangle(Line):
     @njit(cache=True, fastmath=True)
     def __test_point_convex(points, test_point) -> bool:
         for i in range(3):
-            # vector ab
-            l_1 = points[(i+1)%3] - points[i]
-            # vector ac
-            l_2 = points[(i+2)%3] - points[i]
-            # vector ap
-            l_3 = test_point - points[i]
-
-            # ab x ap
-            c_1 = nbnp.cross2d(l_1, l_3)
-            # ap x ac
-            c_2 = nbnp.cross2d(l_3, l_2)
-
-            # if (ab x ap) * (ap x ac) < 0 than the point is in convex
-            if c_1 * c_2 <= 0.0:
+            # if CCW(p1, p2, test_point) * CCW(p1, test_point, p3) < 0 than the point is in convex
+            if counter_clockwise(points[i], points[(i+1)%3], test_point) * counter_clockwise(points[i], test_point, points[(i+2)%3]) <= 0.0:
                 return False
         return True
 
