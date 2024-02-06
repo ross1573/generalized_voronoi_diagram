@@ -1,6 +1,7 @@
 # Generalized voronoi diagram  
 A generalized voronoi diagram for python.  
 Supports points, lines, polygons on generation.  
+Description is available at https://doi.org/10.5391/IJFIS.2023.23.3.259  
 
 -----  
 
