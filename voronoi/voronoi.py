@@ -399,10 +399,10 @@ class GeneralizedVoronoi:
 
     def __generate_result(self) -> Result:
         ret_val = Result()
-        ret_val.triangles = np.array(self.__triangles, dtype=Triangle, copy=False)
-        ret_val.boundaries = np.array(self.__boundaries, dtype=Line, copy=False)
+        ret_val.triangles = np.asarray(self.__triangles, dtype=Triangle)
+        ret_val.boundaries = np.asarray(self.__boundaries, dtype=Line)
         ret_val.points = np.array(self.__vor.points, dtype=float, copy=False)
-        ret_val.points_polygon = np.array(self.__triangle_lined_points, dtype=float, copy=False)
+        ret_val.points_polygon = np.asarray(self.__triangle_lined_points, dtype=float)
         ret_val.vertices = np.array(self.__vor.vertices, dtype=float, copy=True)
         ret_val.ridge_vertices = np.array(self.__vor.ridge_vertices, dtype=int, copy=True)
         if len(self.__chains) > 0: 
