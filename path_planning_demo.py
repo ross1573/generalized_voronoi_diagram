@@ -26,7 +26,7 @@ if __name__ == '__main__':
     end = [0.9, 0.9]
 
     # polygon detector
-    pd = PolygonDetector('./testdata/voronoi/map0.png', [214, 255])
+    pd = PolygonDetector('./testdata/map0.png', [214, 255])
     polygons = pd.run(bound=[1.0, 1.0])
 
     # voronoi
