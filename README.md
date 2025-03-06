@@ -7,16 +7,20 @@ Description is available at https://doi.org/10.5391/IJFIS.2023.23.3.259
 
 ### Requirments
 ~~~
-python   
-    - numpy  
-    - matplotlib  
-    - scipy  
-    - rdp  
-    - opencv-python  
-    - numba  
-    - tripy  
-    - pyvisgraph  
+python (3.13)   
+    - numpy (2.1)  
+    - matplotlib (3.10)  
+    - scipy (1.15)  
+    - rdp (0.8)  
+    - opencv-python (4.11)  
+    - numba (0.61)  
+    - tripy (1.0)  
+    - pyvisgraph (0.2.1)  
 ~~~
+specified version (in parentheses) does not imply a minimum requirement  
+its' the most recent tested version (tested on macos 15.3.1, M3 Max)   
+since numba is still unrealiable on some platforms, removing 'jit' can improve compatibility issues  
+  
 -----  
   
 ### Path planning demo result
