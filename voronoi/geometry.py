@@ -130,7 +130,7 @@ class Line:
         return self.__generate_line_base(_1, _2, 1, self.point_distance)
     
     @staticmethod
-    @jit(nopython=False, forceobj=True)
+    # @jit(nopython=False, forceobj=True)
     def __generate_line_base(_1, _2, axis, point_distance):
         result = []
 
