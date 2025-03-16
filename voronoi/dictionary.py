@@ -19,6 +19,9 @@ class IndexDict:
         sorted = []
         idx = 1 if reverse else 0
 
+        if len(vec) == 0:
+            return {}
+
         for i in range(len(vec)):
             vertex = vec[i]
             sorted.append(vertex)
